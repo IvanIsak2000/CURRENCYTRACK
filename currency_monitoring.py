@@ -19,7 +19,8 @@ def close_programm():
 
 try:
     from config import API_KEY as API_KEY
-except :
+    
+except:
     print('API_KEY is now found or not set!')
     close_programm()
 
