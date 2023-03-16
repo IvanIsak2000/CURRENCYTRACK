@@ -86,6 +86,8 @@ To do this, run the script and enter the time interval after which the currency 
 --
 Site used for the script: <a href ='https://currate.ru'>https://currate.ru<a>
 
+**:rage:Please note that the site <a href ='https://currate.ru'>https://currate.ru<a> has a REQUEST LIMIT of 1000 per day!**
+
 5.ERROR PROCESSING 
 --
 
