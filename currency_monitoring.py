@@ -1,5 +1,3 @@
-import requests
-from bs4 import BeautifulSoup
 import time
 import re
 import sys
@@ -9,6 +7,9 @@ from datetime import datetime
 import tabulate
 import pytz
 import ast
+import requests
+from bs4 import BeautifulSoup
+import dearpygui.dearpygui as dpg
 
 
 def close_programm():
@@ -18,9 +19,9 @@ def close_programm():
 
 
 try:
-    from config import API_KEY as API_KEY
-    
-except:
+    from config import API_KEY 
+
+except ImportError:
     print('API_KEY is now found or not set!')
     close_programm()
 
@@ -31,7 +32,6 @@ logging.basicConfig(
     format="%(asctime)s %(levelname)s %(message)s")
 
 
-check_time = int(input("Время проверки/check time(сек/sec): "))
 list_of_currencies = [
     'BCH',
     'BTC',
@@ -57,23 +57,9 @@ list_of_currencies = [
     'ZEC']
 
 
-first_currency = input(
-    f"Введите первую валюту/Wtire first  currency: {list_of_currencies}): ")
-
-second_currency = input(
-    f"Введите вторую валюту/Wtire second  currency: {list_of_currencies}: ")
-
-if first_currency and second_currency in list_of_currencies and first_currency != second_currency:
-    pass
-else:
-
-    close_programm()
-
-print(f"SETTINGS: 1 {first_currency} = {second_currency}")
-
-
-def currency_checking(operation_number):
-
+def query_execution(operation_number):
+    first_currency = dpg.get_value('currency_1')
+    second_currency = dpg.get_value('currency_2')
     # СБОР НЫНЕШНЕГО КУРСА ВАЛЮТ
     URL = (
         f'https://currate.ru/api/?get=rates&pairs={first_currency}{second_currency}&key={API_KEY}')
@@ -83,62 +69,99 @@ def currency_checking(operation_number):
     soup = BeautifulSoup(full_page.content, 'html.parser')
     soup_text = soup.getText()
     soup_dict = ast.literal_eval(soup_text)
+    if soup_dict['status'] == '500':
+        print('Internal Server Error\nThis means that there may not be such a pair of currencies on the currency.ru server, it is recommended to choose other currencies!')
+        return close_programm()
     data = soup_dict["data"][first_currency + second_currency]
-    return data
+    return (data)
 
 
-operation_number = 0
+def main():
+    first_currency = dpg.get_value('currency_1')
+    second_currency = dpg.get_value('currency_2')
+    check_time = round(float(dpg.get_value('check_time')))
 
-while True:
+    if first_currency == second_currency:
+        print('Two identical currencies!')
+        return close_programm()
+    dpg.set_value('info', f"SETTINGS: 1 {first_currency} = {second_currency}")
+    operation_number = 0
+    while True:
 
-    try:
+        try:
+            currency_at_the_beginning = query_execution(
+                operation_number)  # first data
+            current_time1 = datetime.now(pytz.timezone(
+                'Europe/Moscow')).strftime("%H:%M:%S %Y-%m-%d")  # first time
 
-        currency_at_the_beginning = currency_checking(
-            operation_number)  # first data
-        current_time1 = datetime.now(pytz.timezone(
-            'Europe/Moscow')).strftime("%H:%M:%S %Y-%m-%d")  # first time
+            time.sleep(check_time)  # waiting
 
-        time.sleep(check_time)  # waiting
+            currency_after = query_execution(
+                operation_number)  # second data
+            current_time2 = datetime.now(pytz.timezone(
+                'Europe/Moscow')).strftime("%H:%M:%S %Y-%m-%d")  # second time
 
-        currency_after = currency_checking(
-            operation_number)  # second data
-        current_time2 = datetime.now(pytz.timezone(
-            'Europe/Moscow')).strftime("%H:%M:%S %Y-%m-%d")  # second time
+            different = float(currency_at_the_beginning) - float(currency_after)
+            print(operation_number)
+            print(tabulate.tabulate([["Was",
+                                    currency_at_the_beginning,
+                                    current_time1,
 
-        different = float(currency_at_the_beginning) - float(currency_after)
-        print(operation_number)
-        print(tabulate.tabulate([["Was",
-                                  currency_at_the_beginning,
-                                  current_time1,
+                                    'OK'],
+                                    ["Became",
+                                    currency_after,
+                                    current_time2,
+                                    different]],
+                                    tablefmt="simple",
+                                    disable_numparse=False))
 
-                                  'OK'],
-                                 ["Became",
-                                  currency_after,
-                                  current_time2,
-                                  different]],
-                                tablefmt="simple",
-                                disable_numparse=False))
+            with open('history_currency.txt', 'a') as file:
+                data = tabulate.tabulate([["Was",
+                                        currency_at_the_beginning,
+                                        current_time1, 'OK'],
+                                        ["Became",
+                                        currency_after,
+                                        current_time2, different]],
+                                        tablefmt="simple",
+                                        disable_numparse=False)
 
-        with open('history_currency.txt', 'a') as file:
-            data = tabulate.tabulate([["Was",
-                                       currency_at_the_beginning,
-                                       current_time1, 'OK'],
-                                      ["Became",
-                                     currency_after,
-                                     current_time2, different]],
-                                     tablefmt="simple",
-                                     disable_numparse=False)
+                file.write(f'{operation_number}')
+                file.write(data)
+                file.write('-----------------------------------------')
 
-            file.write(f'{operation_number}')
-            file.write(data)
-            file.write('-----------------------------------------')
+            # logging if OK
+            logging.info(f'OK, operation  number:{operation_number}')
 
-        # logging if OK
-        logging.info(f'OK, operation  number:{operation_number}')
+        except Exception as err:
+            print(err)
+            logging.exception(err, exc_info=True)
+            time.sleep(10)  # logging if  NOT OK
+            pass
 
-    except Exception as err:
-        print('Error')
-        logging.exception(err, exc_info=True)  # logging if  NOT OK
-        pass
+        operation_number += 1
 
-    operation_number += 1
+
+dpg.create_context()
+dpg.create_viewport()
+dpg.setup_dearpygui()
+
+with dpg.window() as main_window:
+
+    with dpg.group(horizontal=True):
+        dpg.add_listbox(items=list_of_currencies, width=200, tag='currency_1')
+        dpg.add_listbox(items=list_of_currencies, width=200, tag='currency_2')
+
+    check_time = dpg.add_input_text(label='check time(sec)', tag='check_time')
+    dpg.add_button(label='Start', callback=main)
+
+    dpg.add_spacer(height=10)
+    dpg.add_text('not set', tag='info')
+
+
+dpg.set_viewport_title("currency monitoring")
+dpg.set_primary_window(main_window, True)
+dpg.set_viewport_width(450)
+dpg.set_viewport_height(500)
+dpg.show_viewport()
+dpg.start_dearpygui()
+dpg.destroy_context()
