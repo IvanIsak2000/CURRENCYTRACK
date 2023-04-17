@@ -73,7 +73,7 @@ def query_execution(operation_number):
         print('Internal Server Error\nThis means that there may not be such a pair of currencies on the currency.ru server, it is recommended to choose other currencies!')
         return close_programm()
     data = soup_dict["data"][first_currency + second_currency]
-    return (data)
+    return data
 
 
 def main():
@@ -129,13 +129,13 @@ def main():
                 file.write(data)
                 file.write('-----------------------------------------')
 
-            # logging if OK
-            logging.info(f'OK, operation  number:{operation_number}')
+           
+            logging.info(f'OK, operation  number:{operation_number}') # logging if OK
 
         except Exception as err:
             print(err)
-            logging.exception(err, exc_info=True)
-            time.sleep(10)  # logging if  NOT OK
+            logging.exception(err, exc_info=True)# logging if  NOT OK
+            time.sleep(10)  
             pass
 
         operation_number += 1
