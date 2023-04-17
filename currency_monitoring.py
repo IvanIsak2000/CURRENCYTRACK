@@ -19,7 +19,7 @@ def close_programm():
 
 
 try:
-    from config import API_KEY 
+    from config import API_KEY
 
 except ImportError:
     print('API_KEY is now found or not set!')
@@ -101,41 +101,31 @@ def main():
             current_time2 = datetime.now(pytz.timezone(
                 'Europe/Moscow')).strftime("%H:%M:%S %Y-%m-%d")  # second time
 
-            different = float(currency_at_the_beginning) - float(currency_after)
+            different = float(currency_at_the_beginning) - \
+                float(currency_after)
             print(operation_number)
             print(tabulate.tabulate([["Was",
                                     currency_at_the_beginning,
                                     current_time1,
 
                                     'OK'],
-                                    ["Became",
-                                    currency_after,
-                                    current_time2,
-                                    different]],
+                                     ["Became",
+                                     currency_after,
+                                     current_time2,
+                                     different]],
                                     tablefmt="simple",
                                     disable_numparse=False))
-
             with open('history_currency.txt', 'a') as file:
-                data = tabulate.tabulate([["Was",
-                                        currency_at_the_beginning,
-                                        current_time1, 'OK'],
-                                        ["Became",
-                                        currency_after,
-                                        current_time2, different]],
-                                        tablefmt="simple",
-                                        disable_numparse=False)
-
-                file.write(f'{operation_number}')
+                data = f'{operation_number}\nWas {currency_at_the_beginning} {current_time1} Ok\nBecame {currency_after} {current_time2} {different}\n-----------------------------------------\n'
                 file.write(data)
-                file.write('-----------------------------------------')
 
-           
-            logging.info(f'OK, operation  number:{operation_number}') # logging if OK
+            # logging if OK
+            logging.info(f'OK, operation  number:{operation_number}')
 
         except Exception as err:
             print(err)
-            logging.exception(err, exc_info=True)# logging if  NOT OK
-            time.sleep(10)  
+            logging.exception(err, exc_info=True)  # logging if  NOT OK
+            time.sleep(10)
             pass
 
         operation_number += 1
