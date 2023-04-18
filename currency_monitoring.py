@@ -33,51 +33,68 @@ logging.basicConfig(
 
 
 list_of_currencies = [
-    'BCH',
-    'BTC',
-    'BTG',
-    'BYN',
-    'CAD',
-    'CHF',
-    'CNY',
-    'ETH',
-    'EUR',
+    'AUD',
+    'AZN',
     'GBP',
+    'AMD',
+    'BYN',
+    'BGN',
+    'BRL',
+    'HUF',
+    'VND',
+    'HKD',
     'GEL',
-    'IDR',
-    'JPY',
-    'LKR',
-    'MDL',
-    'MMK',
-    'RSD',
-    'RUB',
-    'THB',
+    'DKK',
+    'AED',
     'USD',
-    'XRP',
-    'ZEC']
+    'EUR',
+    'EGP',
+    'INR',
+    'IDR',
+    'KZT',
+    'CAD',
+    'QAR',
+    'KGS',
+    'CNY',
+    'MDL',
+    'NZD',
+    'NOK',
+    'PLN',
+    'RON',
+    'XDR',
+    'SGD',
+    'TJS',
+    'THB',
+    'TRY',
+    'TMT',
+    'UZS',
+    'UAH',
+    'CZK',
+    'SEK',
+    'CHF',
+    'RSD',
+    'ZAR',
+    'KRW',
+    'JPY']
 
 
 def query_execution(operation_number):
-    first_currency = dpg.get_value('currency_1')
+    first_currency = dpg.get_value('currency_1')  # default RUB
     second_currency = dpg.get_value('currency_2')
-    # СБОР НЫНЕШНЕГО КУРСА ВАЛЮТ
     URL = (
-        f'https://currate.ru/api/?get=rates&pairs={first_currency}{second_currency}&key={API_KEY}')
+        f'https://www.cbr-xml-daily.ru/daily_json.js')
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.62"}
     full_page = requests.get(URL, headers=headers)
     soup = BeautifulSoup(full_page.content, 'html.parser')
     soup_text = soup.getText()
     soup_dict = ast.literal_eval(soup_text)
-    if soup_dict['status'] == '500':
-        print('Internal Server Error\nThis means that there may not be such a pair of currencies on the currency.ru server, it is recommended to choose other currencies!')
-        return close_programm()
-    data = soup_dict["data"][first_currency + second_currency]
+    data = soup_dict['Valute'][second_currency]['Value']
     return data
 
 
 def main():
-    first_currency = dpg.get_value('currency_1')
+    first_currency = dpg.get_value('currency_1')  # default RUB
     second_currency = dpg.get_value('currency_2')
     check_time = round(float(dpg.get_value('check_time')))
 
@@ -138,7 +155,7 @@ dpg.setup_dearpygui()
 with dpg.window() as main_window:
 
     with dpg.group(horizontal=True):
-        dpg.add_listbox(items=list_of_currencies, width=200, tag='currency_1')
+        dpg.add_listbox(items=['RUB'], width=200, tag='currency_1')
         dpg.add_listbox(items=list_of_currencies, width=200, tag='currency_2')
 
     check_time = dpg.add_input_text(label='check time(sec)', tag='check_time')
