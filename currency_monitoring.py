@@ -12,18 +12,10 @@ from bs4 import BeautifulSoup
 import dearpygui.dearpygui as dpg
 
 
-def close_programm():
-    print("INPUT ERROR")
+def close_programm(name_of_error):
+    print(name_of_error)
     to_exit = input("PRESS ENTER FOR EXIT")
     exit()
-
-
-try:
-    from config import API_KEY
-
-except ImportError:
-    print('API_KEY is now found or not set!')
-    close_programm()
 
 logging.basicConfig(
     level=logging.INFO,
@@ -99,8 +91,8 @@ def main():
     check_time = round(float(dpg.get_value('check_time')))
 
     if first_currency == second_currency:
-        print('Two identical currencies!')
-        return close_programm()
+        error = 'Two identical currencies!'
+        return close_programm(error)
     dpg.set_value('info', f"SETTINGS: 1 {first_currency} = {second_currency}")
     operation_number = 0
     while True:
