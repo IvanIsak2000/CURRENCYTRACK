@@ -3,9 +3,12 @@ EN
 
 1.BASIC
 --
-This is a script for tracking the most famous currencies to the ruble!
+Able currencies:
 
 ```
+USD
+RUB
+EUR
 AUD
 AZN
 GBP
@@ -19,8 +22,6 @@ HKD
 GEL
 DKK
 AED
-USD
-EUR
 EGP
 INR
 IDR
@@ -97,9 +98,7 @@ Let's say you want to track the exchange rate of different currencies, for this 
 
 4.API
 --
-Site used for the script: <a href ='https://currate.ru'>https://currate.ru<a>
-
-**:rage:Please note that the site <a href ='https://currate.ru'>https://currate.ru<a> has a REQUEST LIMIT of 1000 per day!**
+-
 
 5.ERROR PROCESSING 
 --
