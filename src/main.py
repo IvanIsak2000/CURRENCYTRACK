@@ -71,7 +71,7 @@ def query_execution() -> float:
 
     except requests.exceptions as err:
         logger.error(err)
-        return SystemExit(err)
+        return err
 
     if full_page.status_code == 200:
         soup = BeautifulSoup(full_page.content, 'html.parser')
