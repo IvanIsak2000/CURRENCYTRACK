@@ -1,7 +1,7 @@
 
 <div aloigh='center'>
   
-![logo](https://github.com/IvanIsak2000/currency_monitoring/assets/79650307/63f3ccb8-e71c-4135-8b67-358bb3a72c49)
+![logo](https://github.com/IvanIsak2000/CURRENCYTRACK/assets/79650307/63f3ccb8-e71c-4135-8b67-358bb3a72c49)
 
 </div>
 
@@ -73,7 +73,7 @@ This program is designed to monitor the change of two currencies.
 ## Installation
 1. Clone repo
 ```bash
-git clone https://github.com/IvanIsak2000/currency_monitoring.git
+git clone https://github.com/IvanIsak2000/CURRENCYTRACK.git
 ```
 
 2. Change folder
