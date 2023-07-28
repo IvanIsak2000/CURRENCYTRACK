@@ -1,74 +1,124 @@
-EN
-==
 
-1.BASIC
---
-Able currencies:
+<div aloigh='center'>
+  
+![logo](https://github.com/IvanIsak2000/currency_monitoring/assets/79650307/63f3ccb8-e71c-4135-8b67-358bb3a72c49)
 
+</div>
+
+## BASIC
+
+This program is designed to monitor the change of two currencies.
+
+
+- Python: `=>3.7`
+
+- Package manager: <a href='https://python-poetry.org/'>poetry</a>
+
+- API: <a href='https://freecurrencyapi.com/'>open site<a/>
+
+
+
+<details>
+ <summary>Able currencies</summary>
+  
+  ```
+  USD
+  RUB
+  EUR
+  AUD
+  AZN
+  GBP
+  AMD
+  BYN
+  BGN
+  BRL
+  HUF
+  VND
+  HKD
+  GEL
+  DKK
+  AED
+  EGP
+  INR
+  IDR
+  KZT
+  CAD
+  QAR
+  KGS
+  CNY
+  MDL
+  NZD
+  NOK
+  PLN
+  RON
+  XDR
+  SGD
+  TJS
+  THB
+  TRY
+  TMT
+  UZS
+  UAH
+  CZK
+  SEK
+  CHF
+  RSD
+  ZAR
+  KRW
+  JPY
+  ```
+</details>
+
+
+## Installation
+1. Clone repo
+```bash
+git clone https://github.com/IvanIsak2000/currency_monitoring.git
 ```
-USD
-RUB
-EUR
-AUD
-AZN
-GBP
-AMD
-BYN
-BGN
-BRL
-HUF
-VND
-HKD
-GEL
-DKK
-AED
-EGP
-INR
-IDR
-KZT
-CAD
-QAR
-KGS
-CNY
-MDL
-NZD
-NOK
-PLN
-RON
-XDR
-SGD
-TJS
-THB
-TRY
-TMT
-UZS
-UAH
-CZK
-SEK
-CHF
-RSD
-ZAR
-KRW
-JPY
+
+2. Change folder
+ ```bash
+ cd src
 ```
 
-2.FUNCTIONS
---
+3. Activate `poetry` environment
+```bash
+poetry shell
+```
+
+4. Install dependencies
+```bash
+poetry install  
+```
+
+5. Get `API key`
+  - Open <a href='https://freecurrencyapi.com/'>freecurrencyapi</a>
+  - Log in 
+  -  Copy your `API key`s
+     
+6. Open `config.py`
+   
+   Paste your `API key` in `API_KEY`
+ 
+8. Launch program
+```bash
+python3 main.py
+```
+
+## FUNCTIONS
+
 1. Set the scan interval
 2. Select the ratio of the two currencies
 3. Writing price history to a file
 4. The script keeps a log of operations (logging)
 
 
-3.USAGE HOWTO
---
+## USAGE HOWTO
 
 Let's say you want to track the exchange rate of different currencies, for this follow the launch steps
 
 1.CHOOSE YOUR MAIN CURRENCY
->![1st currency](https://user-images.githubusercontent.com/79650307/232417512-e23f67ed-2e9a-444d-9cf0-232883e2e984.png)
 >
->Here is a dollar 
 
 2.CHOOSE A SECOND CURRENCY
 >![2nd currency](https://user-images.githubusercontent.com/79650307/232417605-c1936382-1217-4fa7-8a1e-4d8be98a4781.png)
@@ -96,12 +146,14 @@ Let's say you want to track the exchange rate of different currencies, for this 
 >![windows](https://user-images.githubusercontent.com/79650307/232423286-5943f8cf-2cc4-4aa8-a856-706cec3a98de.png)
 
 
-4.API
---
--
+## API
+This program used <a href='https://freecurrencyapi.com/'>this API<a/>
+From website:
+- Requests limit: `5000/month`
 
-5.ERROR PROCESSING 
---
+
+## ERROR PROCESSING 
+
 
 ``The script keeps a log of successful and unsuccessful operations.``
 
