@@ -165,7 +165,7 @@ with dpg.window() as main_window:
     dpg.add_text('', tag='error_message', color=[255, 0, 0])
 
 
-dpg.set_viewport_title("Currency monitoring",)
+dpg.set_viewport_title("CURRENCYTRACK",)
 dpg.set_primary_window(main_window, True, )
 dpg.set_viewport_width(450)
 dpg.set_viewport_height(500)
