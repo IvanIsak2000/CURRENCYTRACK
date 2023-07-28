@@ -23,12 +23,14 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
+def exit(err: str) -> None:
+    sys.exit(err)
 
 def write_in_history(
         operation_number: int,
-        currency1: str,
+        currency1: float,
         time1: str,
-        currency2: str,
+        currency2: float,
         time2: str,
         different: float) -> None:
     with open('history_of_currencies.txt', 'a') as file:
@@ -56,7 +58,7 @@ def query_execution(first_currency: str, second_currency: str) -> float:
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.62"}
 
-        full_page = requests.get(
+        page = requests.get(
             site_url,
             params={
                 'apikey': API_KEY,
@@ -68,15 +70,22 @@ def query_execution(first_currency: str, second_currency: str) -> float:
         logger.error(err)
         return console.print(f'[red]{err}')
 
-    if full_page.status_code == 200:
-        soup = BeautifulSoup(full_page.content, 'html.parser')
-        soup_text = soup.getText()
-        text = ast.literal_eval(soup_text)
-        data = dict(text)['data']
-        return list(data.values())[0]
+    
+    match page.status_code:
+        case 200:
+            soup = BeautifulSoup(page.content, 'html.parser')
+            soup_text = soup.getText()
+            text = ast.literal_eval(soup_text)
+            data = dict(text)['data']
+            return list(data.values())[0]
 
-    logger.exception('Server don`t working')
-    return console.print('[red]Sorry, server don`t working')
+        case 401:
+            logger.error('Not valid API_KEY')
+            return console.print('[red]Not valid API_KEY\nPlease check API_KEY from config.py is exist!')
+        
+        case _:
+            logger.exception('Code status: ', page.status_code)
+            return console.print('[red]Sorry, program get error with code status: ', page.status_code)
 
 
 def main_loop() -> str:
@@ -103,7 +112,9 @@ def main_loop() -> str:
     operation_number = 0
     while True:
         try:
-            currency_at_the_beginning = query_execution(first_currency,second_currency)  # first data
+            currency_at_the_beginning = query_execution(first_currency, second_currency)  # first data
+            if currency_at_the_beginning != float:
+                exit('Error: program don`t get data')
             current_time1 = datetime.now(pytz.timezone(
                 'Europe/Moscow')).strftime("%H:%M:%S %Y-%m-%d")  # first time
 
