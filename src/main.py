@@ -41,20 +41,15 @@ Became {currency2} {time2} {different}
         file.write(data)
     logger.info(f'Data with operation number {operation_number} was wrote')
 
-
-def close_program_with_error(name_of_error: str) -> str:
-    logger.error(name_of_error)
-    console.print(f'{name_of_error}\nPlease reboot program!')
+def time_is_valid(_time: str) -> bool:
+    return _time.isdigit()
 
 
-def query_execution() -> float:
+def query_execution(first_currency: str, second_currency: str) -> float:
     '''
     This function sends a request to the server
     and parses data from it: currency value
     '''
-
-    first_currency = dpg.get_value('currency_1')
-    second_currency = dpg.get_value('currency_2')
 
     try:
         site_url = 'https://api.freecurrencyapi.com/v1/latest'
@@ -71,7 +66,7 @@ def query_execution() -> float:
 
     except requests.exceptions as err:
         logger.error(err)
-        return err
+        return console.print(f'[red]{err}')
 
     if full_page.status_code == 200:
         soup = BeautifulSoup(full_page.content, 'html.parser')
@@ -81,7 +76,7 @@ def query_execution() -> float:
         return list(data.values())[0]
 
     logger.exception('Server don`t working')
-    close_program_with_error('Sorry, server don`t orking')
+    return console.print('[red]Sorry, server don`t working')
 
 
 def main_loop() -> str:
@@ -90,25 +85,31 @@ def main_loop() -> str:
     second_currency = dpg.get_value('currency_2')
 
     if first_currency == second_currency:
-        return close_program_with_error('Two identical currencies!')
+        logger.exception('Two identical currencies!')
+        return console.print('[red]Two identical currencies!')
 
-    try:
-        time_to_check = float(dpg.get_value('time_to_check'))
-    except ValueError:
-        return close_program_with_error('Please write time in seconds!')
+    _time = dpg.get_value('time_to_check')
+
+    if time_is_valid(_time):
+        time_to_check = int(_time)
+    else:
+        logger.exception('Not integer time')
+        return console.print('Time need to integer digit, for example: 10')
+
+
 
     dpg.set_value('info', f"Set as: 1 {first_currency} = {second_currency}")
     logger.info('Start loop')
     operation_number = 0
     while True:
         try:
-            currency_at_the_beginning = query_execution()  # first data
+            currency_at_the_beginning = query_execution(first_currency,second_currency)  # first data
             current_time1 = datetime.now(pytz.timezone(
                 'Europe/Moscow')).strftime("%H:%M:%S %Y-%m-%d")  # first time
 
             time.sleep(time_to_check)  # waiting
 
-            currency_after = query_execution()  # second data
+            currency_after = query_execution(first_currency, second_currency)  # second data
             current_time2 = datetime.now(pytz.timezone(
                 'Europe/Moscow')).strftime("%H:%M:%S %Y-%m-%d")  # second time
 
