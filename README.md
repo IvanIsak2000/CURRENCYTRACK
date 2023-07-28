@@ -7,19 +7,18 @@
 
 ## BASIC
 
-This program is designed to monitor the change of two currencies.
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1500&repeat=false&width=800&height=30&lines=This+program+is+designed+to+monitor++the+change+of+two+currencies.)](https://git.io/typing-svg) 
 
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1500&repeat=false&width=800&height=30&lines=Python+%3D%3E+3.7)](https://git.io/typing-svg)
 
-- Python: `=>3.7`
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1500&repeat=false&width=800&height=30&lines=Package+manager%3A+poetry)](https://git.io/typing-svg)
 
-- Package manager: <a href='https://python-poetry.org/'>poetry</a>
-
-- API: <a href='https://freecurrencyapi.com/'>open site<a/>
+[![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1500&repeat=false&width=800&height=30&lines=API%3A+freecurrencyapi.com)](https://git.io/typing-svg)
 
 
 
 <details>
- <summary>Able currencies</summary>
+ <summary>ABLE CURRENCIES</summary>
   
   ```
   USD
@@ -118,37 +117,40 @@ python3 main.py
 Let's say you want to track the exchange rate of different currencies, for this follow the launch steps
 
 1.CHOOSE YOUR MAIN CURRENCY
->
+>![1](https://github.com/IvanIsak2000/CURRENCYTRACK/assets/79650307/97934fe6-6fc8-40b2-99fe-375f03b55e27)
 
 2.CHOOSE A SECOND CURRENCY
->![2nd currency](https://user-images.githubusercontent.com/79650307/232417605-c1936382-1217-4fa7-8a1e-4d8be98a4781.png)
->
->We chose the second currency as Bitcoin.
->Also just click on the currency
+>![2](https://github.com/IvanIsak2000/CURRENCYTRACK/assets/79650307/9e775757-fb0f-43a1-9b2d-9abc1cde8cda)
+
 
 3.CHOOSE THE VERIFICATION INTERVAL
->![time](https://user-images.githubusercontent.com/79650307/232417724-f2519c79-314f-4b75-92d7-5d51ec37f5a0.png)
->
->In my case time = 10 seconds
+>![time](https://github.com/IvanIsak2000/CURRENCYTRACK/assets/79650307/ac8711cd-b3eb-4a20-9f1e-1e09fc9cb9f4)
+
 
 4.WE LOOK
->![settings](https://user-images.githubusercontent.com/79650307/232417910-c6639752-9929-4b0e-981a-4bb3347181d4.png)
->
->![result](https://user-images.githubusercontent.com/79650307/232418565-222ef4d3-ab3f-471c-88e9-e6e99caf5a73.png)
->
->Here you can see that one dollar is worth that many bitcoins first and then after 10 seconds (almost). The red mark means everything is fine. Below, under the red >mark, the difference is marked: that is, the currency has not changed in 10 seconds.
+>![set as](https://github.com/IvanIsak2000/CURRENCYTRACK/assets/79650307/e552af1c-fa53-4cca-b179-1289e716572a)
+
+
+>![result](https://github.com/IvanIsak2000/CURRENCYTRACK/assets/79650307/35880516-a77c-4ce7-9b1b-24f5237d0ec9)
 
 5.LOGGING
 >Please note that each request is logged to a file, and there is also a request history file!
 >
->![image](https://user-images.githubusercontent.com/79650307/225626728-36df2a4c-9a6c-4e91-af57-963f63d26ebe.png)
+>![files](https://github.com/IvanIsak2000/CURRENCYTRACK/assets/79650307/65a6f296-1289-46c1-8e82-bb35cef8c620)
+
+>First file contain history:
 >
->![windows](https://user-images.githubusercontent.com/79650307/232423286-5943f8cf-2cc4-4aa8-a856-706cec3a98de.png)
+>![history](https://github.com/IvanIsak2000/CURRENCYTRACK/assets/79650307/593b45e5-7f3a-41b5-9226-3992e5a285cb)
+
+>Second file contain all log data:
+>
+>![log file](https://github.com/IvanIsak2000/CURRENCYTRACK/assets/79650307/632787ac-87b1-4963-95fd-55ef0c694241)
+
+
 
 
 ## API
 This program used <a href='https://freecurrencyapi.com/'>this API<a/>
-From website:
 - Requests limit: `5000/month`
 
 
