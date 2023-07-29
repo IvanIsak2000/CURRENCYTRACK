@@ -4,6 +4,9 @@
 
 </div>
 
+
+
+
 # BASIC
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1500&repeat=false&width=800&height=30&lines=This+program+is+designed+to+monitor++the+change+of+two+currencies.)](https://git.io/typing-svg) 
@@ -13,6 +16,8 @@
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1500&repeat=false&width=800&height=30&lines=Package+manager%3A+poetry)](https://git.io/typing-svg)
 
 [![Typing SVG](https://readme-typing-svg.demolab.com?font=Fira+Code&pause=1500&repeat=false&width=800&height=30&lines=API%3A+freecurrencyapi.com)](https://git.io/typing-svg)
+
+
 
 # Main currencies
 
@@ -39,7 +44,6 @@ RUB
   CZK
   DKK
   EGP
-  EUR
   GBP
   GEL
   HKD
@@ -57,7 +61,6 @@ RUB
   QAR
   RON
   RSD
-  RUB
   SEK
   SGD
   THB
@@ -65,7 +68,6 @@ RUB
   TMT
   TRY
   UAH
-  USD
   UZS
   VND
   XDR
@@ -73,7 +75,7 @@ RUB
   ```
 </details>
 
-<br>
+
 
 # Installation
 
@@ -119,6 +121,7 @@ python3 main.py
   2. Select the ratio of the two currencies
   3. Writing price history to a file
   4. The script keeps a log of operations (logging)
+
 
 
 # How use
