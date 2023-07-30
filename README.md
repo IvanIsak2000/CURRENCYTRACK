@@ -19,7 +19,8 @@
 
 
 
-# Main currencies
+Main currencies
+================
 
 ```
 USD
