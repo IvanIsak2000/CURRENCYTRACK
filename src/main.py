@@ -23,8 +23,22 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-def exit(err: str) -> None:
-    sys.exit(err)
+
+def get_current_time(func):
+    def wrapper(base_currencies: str,
+                second_currency: str) -> tuple[requests.models.Response, str]:
+        got_currencies = func(base_currencies, second_currency)
+        current_time = datetime.now(pytz.timezone(
+            'Europe/Moscow')).strftime("%H:%M:%S %Y-%m-%d")
+        return got_currencies, current_time
+    return wrapper
+
+
+def error_exit_and_log(err: str) -> None:
+    dpg.set_value('error_message', err)
+    logger.error(err)
+    return console.print(f'[red]{err}')
+
 
 def write_in_history(
         operation_number: int,
@@ -32,126 +46,177 @@ def write_in_history(
         time1: str,
         currency2: float,
         time2: str,
-        different: float) -> None:
+        different_between_currencies_values: float) -> None:
     with open('history_of_currencies.txt', 'a') as file:
-        data = f'''
-№{operation_number}:
-Was {currency1} {time1} Ok
-Became {currency2} {time2} {different}
------------------------------------------
-'''
-        file.write(data)
+        file.write(f'\n{operation_number}\n')
+        file.write(tabulate.tabulate([["Was",
+                                       currency1,
+                                       time1,
+
+                                       'OK'],
+                                      ["Became",
+                                     currency2,
+                                     time2,
+                                     different_between_currencies_values]],
+                                     tablefmt="simple",
+                                     disable_numparse=False))
+        file.write(f'\n')
     logger.info(f'Data with operation number {operation_number} was wrote')
 
+
 def time_is_valid(_time: str) -> bool:
-    return _time.isdigit()
+    if _time.isdigit():
+        if int(_time) > 0:
+            return True
+    return False
 
 
-def query_execution(first_currency: str, second_currency: str) -> float:
+def check_data_are_valid_and_start_loop() -> None:
     '''
-    This function sends a request to the server
-    and parses data from it: currency value
+    First function to start main loop:
+    this is the initial function that checks
+    the validity of the data before running
+    the loop: it takes the primary and secondary
+    currency and time from the GUI using dearpygui's
+    built-in get_value function
     '''
 
+    base_currencies = dpg.get_value('currency_1')
+    second_currency = dpg.get_value('currency_2')
+    wait_time = dpg.get_value('time_to_check')
+
+    if base_currencies != second_currency:
+        if time_is_valid(wait_time):
+            dpg.set_value(
+                'info', f"Set as: 1 {base_currencies} = {second_currency}")
+            main_loop(base_currencies, second_currency, int(wait_time))
+        else:
+            return error_exit_and_log('Not valid time')
+    else:
+        return error_exit_and_log('Two identical currencies')
+
+
+@get_current_time
+def request_to_api_to_get_page(
+        base_currencies: str,
+        second_currency: str) -> tuple[requests.models.Response, str]:
+    '''
+    This function send one a request to the server
+    and return page or close with error
+    '''
+
+    site_url = 'https://api.freecurrencyapi.com/v1/latest'
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; \
+        Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) \
+        Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.62"}
     try:
-        site_url = 'https://api.freecurrencyapi.com/v1/latest'
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36 Edg/107.0.1418.62"}
-
         page = requests.get(
             site_url,
             params={
                 'apikey': API_KEY,
-                'base_currency': first_currency,
+                'base_currency': base_currencies,
                 'currencies': second_currency},
             headers=headers)
-
+        return page
     except requests.exceptions as err:
-        logger.error(err)
-        return console.print(f'[red]{err}')
-
-    
-    match page.status_code:
-        case 200:
-            soup = BeautifulSoup(page.content, 'html.parser')
-            soup_text = soup.getText()
-            text = ast.literal_eval(soup_text)
-            data = dict(text)['data']
-            return list(data.values())[0]
-
-        case 401:
-            logger.error('Not valid API_KEY')
-            return console.print('[red]Not valid API_KEY\nPlease check API_KEY from config.py is exist!')
-        
-        case _:
-            logger.exception('Code status: ', page.status_code)
-            return console.print('[red]Sorry, program get error with code status: ', page.status_code)
+        return error_exit_and_log(err)
 
 
-def main_loop() -> str:
+def page_status_code_is_valid(page: requests.models.Response) -> bool:
+    '''
+    This function check check response valid:
+    if Ok - return True, else return False and print error
+    '''
 
-    first_currency = dpg.get_value('currency_1')
-    second_currency = dpg.get_value('currency_2')
+    try:
+        if page.status_code == 200:
+            logger.info(f'{page.status_code} {page.reason}')
+            return True
 
-    if first_currency == second_currency:
-        logger.exception('Two identical currencies!')
-        return console.print('[red]Two identical currencies!')
+        if page.status_code == 401:
+            logger.info(f'{page.status_code} {page.reason}')
+            error_exit_and_log(
+                'Not valid API_KEY\nPlease check API_KEY from config.py is exist ')
+            return False
 
-    _time = dpg.get_value('time_to_check')
+        else:
+            logger.info(f'{page.status_code} {page.reason}')
+            error_exit_and_log(
+                f'Sorry, program get error with code status: {page.status_code} {page.reason}')
+            return False
+    except Exception as err:
+        logger.info(f'{page.status_code} {page.reason}')
+        return False
 
-    if time_is_valid(_time):
-        time_to_check = int(_time)
-    else:
-        logger.exception('Not integer time')
-        return console.print('Time need to integer digit, for example: 10')
+
+def response_parser(page: requests.models.Response) -> float:
+    soup = BeautifulSoup(page.content, 'html.parser')
+    soup_text = soup.getText()
+    text = ast.literal_eval(soup_text)
+    data = dict(text)['data']
+    try:
+        return float(list(data.values())[0])
+    except ValueError:
+        return error_exit_and_log('Server response is not float')
 
 
-
-    dpg.set_value('info', f"Set as: 1 {first_currency} = {second_currency}")
+def main_loop(
+        base_currencies: str,
+        second_currency: str,
+        wait_time: int) -> str:
     logger.info('Start loop')
     operation_number = 0
     while True:
-        try:
-            currency_at_the_beginning = query_execution(first_currency, second_currency)  # first data
-            if currency_at_the_beginning != float:
-                exit('Error: program don`t get data')
-            current_time1 = datetime.now(pytz.timezone(
-                'Europe/Moscow')).strftime("%H:%M:%S %Y-%m-%d")  # first time
-
-            time.sleep(time_to_check)  # waiting
-
-            currency_after = query_execution(first_currency, second_currency)  # second data
-            current_time2 = datetime.now(pytz.timezone(
-                'Europe/Moscow')).strftime("%H:%M:%S %Y-%m-%d")  # second time
-
-            different = float(currency_at_the_beginning) - \
-                float(currency_after)
-            print('\n', operation_number)
-            print(tabulate.tabulate([["Was",
-                                    currency_at_the_beginning,
-                                    current_time1,
-
-                                    'OK'],
-                                     ["Became",
-                                     currency_after,
-                                     current_time2,
-                                     different]],
-                                    tablefmt="simple",
-                                    disable_numparse=False))
-            write_in_history(operation_number,
-                             currency_at_the_beginning,
-                             current_time1,
-                             currency_after,
-                             current_time2,
-                             different)
-            logging.info(f'OK, operation  number:{operation_number}')
-
-        except Exception as e:
-            logging.exception(e, exc_info=True)
-            print(e)
-            time.sleep(10)
-
         operation_number += 1
+
+        first_response = request_to_api_to_get_page(
+            base_currencies, second_currency)  # first data
+
+        if page_status_code_is_valid(first_response[0]):
+            currency_at_the_beginning = response_parser(first_response[0])
+            current_time1 = first_response[1]
+        else:
+            return error_exit_and_log('Program don`t got data')
+
+        # waiting time - maybe currencies values ate changed
+        time.sleep(wait_time)
+
+        second_response = request_to_api_to_get_page(
+            base_currencies, second_currency)  # second data
+
+        if page_status_code_is_valid(second_response[0]):
+            currency_after = response_parser(second_response[0])
+            current_time2 = second_response[1]
+        else:
+            return error_exit_and_log('Program don`t got data')
+
+        different_between_currencies_values = \
+            currency_at_the_beginning - currency_after
+
+        print('\n', operation_number)
+        print(tabulate.tabulate([
+            ["Was",
+             currency_at_the_beginning,
+             current_time1,
+             'OK'],
+
+            ["Became",
+             currency_after,
+             current_time2,
+             different_between_currencies_values]],
+            tablefmt="simple",
+            disable_numparse=True))
+
+        write_in_history(
+            operation_number,
+            currency_at_the_beginning,
+            current_time1,
+            currency_after,
+            current_time2,
+            different_between_currencies_values)
+
+        logging.info(f'Successful, operation  number:{operation_number}')
 
 
 dpg.create_context()
@@ -167,8 +232,8 @@ with dpg.window() as main_window:
     dpg.add_text('\n')
     time_to_check = dpg.add_input_text(
         label='check time(sec)', tag='time_to_check')
-    dpg.add_button(label='Start', callback=main_loop)
-
+    dpg.add_button(label='Start', callback=check_data_are_valid_and_start_loop)
+    
     dpg.add_spacer(height=10)
     dpg.add_text('', tag='info')
 
@@ -184,12 +249,11 @@ dpg.show_viewport()
 
 try:
     dpg.start_dearpygui()
+    dpg.destroy_context()
 except KeyboardInterrupt:
-    console.print('[green]Goodbye!')
     logger.info('Program was closed')
+    console.print('[green1]Goodbye ')
     sys.exit()
 except Exception as e:
-    console.print(f'[red]{e}')
     logger.exception(e)
-
-dpg.destroy_context()
+    console.print(f'[red]{e}')
