@@ -60,7 +60,7 @@ def write_in_history(
                                      different_between_currencies_values]],
                                      tablefmt="simple",
                                      disable_numparse=False))
-        file.write(f'\n')
+        file.write('\n')
     logger.info(f'Data with operation number {operation_number} was wrote')
 
 
@@ -137,16 +137,18 @@ def page_status_code_is_valid(page: requests.models.Response) -> bool:
         if page.status_code == 401:
             logger.info(f'{page.status_code} {page.reason}')
             error_exit_and_log(
-                'Not valid API_KEY\nPlease check API_KEY from config.py is exist ')
+                'Not valid API_KEY\n\
+                Please check API_KEY from config.py is exist ')
             return False
 
         else:
             logger.info(f'{page.status_code} {page.reason}')
             error_exit_and_log(
-                f'Sorry, program get error with code status: {page.status_code} {page.reason}')
+                f'Sorry, program get error with code status: \
+                    {page.status_code} {page.reason}')
             return False
     except Exception as err:
-        logger.info(f'{page.status_code} {page.reason}')
+        logger.info(f'{err} {page.status_code} {page.reason}')
         return False
 
 
@@ -233,13 +235,10 @@ with dpg.window() as main_window:
     time_to_check = dpg.add_input_text(
         label='check time(sec)', tag='time_to_check')
     dpg.add_button(label='Start', callback=check_data_are_valid_and_start_loop)
-    
     dpg.add_spacer(height=10)
     dpg.add_text('', tag='info')
-
     dpg.add_spacer(height=10)
     dpg.add_text('', tag='error_message', color=[255, 0, 0])
-
 
 dpg.set_viewport_title("CURRENCYTRACK",)
 dpg.set_primary_window(main_window, True, )
