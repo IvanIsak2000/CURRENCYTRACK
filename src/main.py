@@ -136,9 +136,7 @@ def page_status_code_is_valid(page: requests.models.Response) -> bool:
 
         if page.status_code == 401:
             logger.info(f'{page.status_code} {page.reason}')
-            error_exit_and_log(
-                'Not valid API_KEY\n\
-                Please check API_KEY from config.py is exist ')
+            error_exit_and_log('Not valid API_KEY')
             return False
 
         else:
