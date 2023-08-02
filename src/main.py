@@ -146,7 +146,7 @@ def page_status_code_is_valid(page: requests.models.Response) -> bool:
                     {page.status_code} {page.reason}')
             return False
     except Exception as err:
-        logger.info(f'{err} {page.status_code} {page.reason}')
+        logger.info(err)
         return False
 
 
