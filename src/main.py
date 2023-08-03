@@ -55,9 +55,9 @@ def write_in_history(
 
                                        'OK'],
                                       ["Became",
-                                     currency2,
-                                     time2,
-                                     different_between_currencies_values]],
+                                       currency2,
+                                       time2,
+                                       different_between_currencies_values]],
                                      tablefmt="simple",
                                      disable_numparse=False))
         file.write('\n')
@@ -72,14 +72,14 @@ def time_is_valid(_time: str) -> bool:
 
 
 def check_data_are_valid_and_start_loop() -> None:
-    '''
+    """
     First function to start main loop:
     this is the initial function that checks
     the validity of the data before running
     the loop: it takes the primary and secondary
-    currency and time from the GUI using dearpygui's
+    currency and time from the GUI using dearpygui
     built-in get_value function
-    '''
+    """
 
     base_currencies = dpg.get_value('currency_1')
     second_currency = dpg.get_value('currency_2')
@@ -99,11 +99,11 @@ def check_data_are_valid_and_start_loop() -> None:
 @get_current_time
 def request_to_api_to_get_page(
         base_currencies: str,
-        second_currency: str) -> tuple[requests.models.Response, str]:
-    '''
+        second_currency: str) -> requests.models.Response | None:
+    """
     This function send one a request to the server
     and return page or close with error
-    '''
+    """
 
     site_url = 'https://api.freecurrencyapi.com/v1/latest'
     headers = {
@@ -124,10 +124,10 @@ def request_to_api_to_get_page(
 
 
 def page_status_code_is_valid(page: requests.models.Response) -> bool:
-    '''
-    This function check check response valid:
+    """
+    This function check response valid:
     if Ok - return True, else return False and print error
-    '''
+    """
 
     try:
         if page.status_code == 200:
@@ -150,7 +150,7 @@ def page_status_code_is_valid(page: requests.models.Response) -> bool:
         return False
 
 
-def response_parser(page: requests.models.Response) -> float:
+def response_parser(page: requests.models.Response) -> float | None:
     soup = BeautifulSoup(page.content, 'html.parser')
     soup_text = soup.getText()
     text = ast.literal_eval(soup_text)
@@ -164,7 +164,7 @@ def response_parser(page: requests.models.Response) -> float:
 def main_loop(
         base_currencies: str,
         second_currency: str,
-        wait_time: int) -> str:
+        wait_time: int) -> None:
     logger.info('Start loop')
     operation_number = 0
     while True:
@@ -224,7 +224,6 @@ dpg.create_viewport()
 dpg.setup_dearpygui()
 
 with dpg.window() as main_window:
-
     with dpg.group(horizontal=True):
         dpg.add_listbox(items=list_of_currencies, width=200, tag='currency_1')
         dpg.add_listbox(items=list_of_currencies, width=200, tag='currency_2')
@@ -238,7 +237,7 @@ with dpg.window() as main_window:
     dpg.add_spacer(height=10)
     dpg.add_text('', tag='error_message', color=[255, 0, 0])
 
-dpg.set_viewport_title("CURRENCYTRACK",)
+dpg.set_viewport_title("CURRENCYTRACK")
 dpg.set_primary_window(main_window, True, )
 dpg.set_viewport_width(450)
 dpg.set_viewport_height(500)
