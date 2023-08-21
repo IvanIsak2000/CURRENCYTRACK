@@ -105,7 +105,7 @@ def request_to_api_to_get_page(
     and return page or close with error
     """
 
-    site_url = 'https://api.freecurrencyapi.com/v1/latest'
+    site_url = 'https://api.currencyapi.com/v3/latest'
     headers = {
         "User-Agent": "Mozilla/5.0 (Windows NT 10.0; \
         Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) \
@@ -156,7 +156,7 @@ def response_parser(page: requests.models.Response) -> float | None:
     text = ast.literal_eval(soup_text)
     data = dict(text)['data']
     try:
-        return float(list(data.values())[0])
+        return float(list(data.values())[0]['value'])
     except ValueError:
         return error_exit_and_log('Server response is not float')
 
@@ -179,7 +179,7 @@ def main_loop(
         else:
             return error_exit_and_log('Program don`t got data')
 
-        # waiting time - maybe currencies values ate changed
+        # waiting time - maybe currencies values are changed
         time.sleep(wait_time)
 
         second_response = request_to_api_to_get_page(
